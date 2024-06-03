@@ -7,6 +7,7 @@ const state = {
     selectedDogID: 1,
 }
 
+// Create the buttons on the top of the page
 function createNavButton(dogs) {
     const navButton = document.createElement('li')
     navButton.classList.add('dogs-list__button')
@@ -20,101 +21,90 @@ function createNavButton(dogs) {
     return navButton
 }
 
-function createNaughtyButton(dog) {
-    const naughtyButton = document.createElement('button')
-    naughtyButton.innerText = `${dog.isGoodDog ? 'Bad dog!' : 'Good dog!'}`
-
-    naughtyButton.addEventListener('click', () => {
-        if (dog.isGoodDog) {
-            dog.isGoodDog = false
-        } else {
-            dog.isGoodDog = true
-        }
-        render()
-    })
-
-    return naughtyButton
-}
-
+// Add logic to the + button
 function createAddButton() {
     const createButton = document.querySelector('.dogs-list__button--add')
     createButton.addEventListener('click', () => {
         state.selectedDogID = 0
-        console.log(state.selectedDogID)
         render()
     })
 }
 
-function render() {
-    const card = document.querySelector('.main__dog-section')
-
-    card.innerHTML = ''
-
-    if (state.selectedDogID === 0) {
-        console.log('Create a new dog entry')
-
-        const header = document.createElement('h2')
-        header.innerText = 'Add a new dog'
-        card.appendChild(header)
-
-        const form = document.createElement('form')
-        form.classList.add('form')
-
-        const nameLabel = document.createElement('label')
-        nameLabel.setAttribute('for', 'name')
-        nameLabel.innerText = "Dog's name"
-        form.appendChild(nameLabel)
-
-        const nameInput = document.createElement('input')
-        nameInput.setAttribute('type', 'text')
-        nameInput.setAttribute('id', 'name')
-        nameInput.setAttribute('name', 'name')
-        form.appendChild(nameInput)
-
-        const imageLabel = document.createElement('label')
-        imageLabel.setAttribute('for', 'image')
-        imageLabel.innerText = "Dog's picture"
-        form.appendChild(imageLabel)
-
-        const imageInput = document.createElement('input')
-        imageInput.setAttribute('type', 'url')
-        imageInput.setAttribute('id', 'image')
-        imageInput.setAttribute('name', 'image')
-        form.appendChild(imageInput)
-
-        const bioLabel = document.createElement('label')
-        bioLabel.setAttribute('for', 'bio')
-        bioLabel.innerText = "Dog's bio"
-        form.appendChild(bioLabel)
-
-        const bioInput = document.createElement('textarea')
-        bioInput.setAttribute('rows', '5')
-        bioInput.setAttribute('id', 'bio')
-        bioInput.setAttribute('name', 'bio')
-        form.appendChild(bioInput)
-
-        const submitButton = document.createElement('input')
-        submitButton.setAttribute('type', 'submit')
-        submitButton.setAttribute('id', 'submit')
-        submitButton.setAttribute('name', 'submit')
-        submitButton.setAttribute('value', "Let's add a dog!")
-        submitButton.classList.add('form__button')
-        form.appendChild(submitButton)
-
-        card.appendChild(form)
-        return
-    }
-
-    const selectedDog = state.dogs.find((dog) => dog.id == state.selectedDogID)
-
+// Create the form including the logic
+function createForm(card) {
+    // Create the elements
     const header = document.createElement('h2')
-    header.innerText = selectedDog.name
+    header.innerText = 'Add a new dog'
     card.appendChild(header)
 
-    const image = document.createElement('img')
-    image.src = selectedDog.image
-    card.appendChild(image)
+    const form = document.createElement('form')
+    form.classList.add('form')
 
+    const nameLabel = document.createElement('label')
+    nameLabel.setAttribute('for', 'name')
+    nameLabel.innerText = "Dog's name"
+    form.appendChild(nameLabel)
+
+    const nameInput = document.createElement('input')
+    nameInput.setAttribute('type', 'text')
+    nameInput.setAttribute('id', 'name')
+    nameInput.setAttribute('name', 'name')
+    form.appendChild(nameInput)
+
+    const imageLabel = document.createElement('label')
+    imageLabel.setAttribute('for', 'image')
+    imageLabel.innerText = "Dog's picture"
+    form.appendChild(imageLabel)
+
+    const imageInput = document.createElement('input')
+    imageInput.setAttribute('type', 'url')
+    imageInput.setAttribute('id', 'image')
+    imageInput.setAttribute('name', 'image')
+    form.appendChild(imageInput)
+
+    const bioLabel = document.createElement('label')
+    bioLabel.setAttribute('for', 'bio')
+    bioLabel.innerText = "Dog's bio"
+    form.appendChild(bioLabel)
+
+    const bioInput = document.createElement('textarea')
+    bioInput.setAttribute('rows', '5')
+    bioInput.setAttribute('id', 'bio')
+    bioInput.setAttribute('name', 'bio')
+    form.appendChild(bioInput)
+
+    const submitButton = document.createElement('input')
+    submitButton.setAttribute('type', 'submit')
+    submitButton.setAttribute('id', 'submit')
+    submitButton.setAttribute('name', 'submit')
+    submitButton.setAttribute('value', "Let's add a dog!")
+    submitButton.classList.add('form__button')
+    form.appendChild(submitButton)
+
+    card.appendChild(form)
+
+    // Add submit action
+    form.addEventListener('submit', (event) => {
+        event.preventDefault()
+        const newDogData = new FormData(form)
+        // Fetch the data from the form and create a new object
+        const newDog = {
+            id: state.dogs.length + 1,
+            name: newDogData.get('name'),
+            image: newDogData.get('image'),
+            bio: newDogData.get('bio'),
+        }
+        // Add the new dog as the first element in the dogs array
+        state.dogs.unshift(newDog)
+        // Show the user the dog that was just created
+        state.selectedDogID = newDog.id
+        // Render both the buttons and the displayed card
+        loadEntirePage()
+    })
+}
+
+// This was factored out of render()
+function dogBio(dog) {
     const bioContainer = document.createElement('div')
     bioContainer.classList.add('main__dog-section__desc')
 
@@ -122,24 +112,93 @@ function render() {
     bioHeader.innerText = 'Bio'
     bioContainer.appendChild(bioHeader)
 
-    const bioText = document.createElement('p')
-    bioText.innerText = selectedDog.bio
-    bioContainer.appendChild(bioText)
-    card.appendChild(bioContainer)
+    const bioContent = document.createElement('p')
+    bioContent.innerText = dog.bio
+    bioContainer.appendChild(bioContent)
+
+    return bioContainer
+}
+
+// This was factored out of render()
+function naughtyText(dog) {
+    const naughtyTextContainer = document.createElement('div')
 
     const naughtyText = document.createElement('p')
     naughtyText.innerHTML = `
         <em>Is naughty?</em>
-        ${selectedDog.isGoodDog ? 'no' : 'yes'}`
-    card.appendChild(naughtyText)
-    card.appendChild(createNaughtyButton(selectedDog))
+        ${dog.isGoodDog ? 'no' : 'yes'}`
+
+    const naughtyButton = document.createElement('button')
+    // Set the text to change depending on the boolean value
+    // of dog.isGoodDog, displaying the corresponding text
+    naughtyButton.innerText = `${dog.isGoodDog ? 'Bad dog!' : 'Good dog!'}`
+
+    // Add logic to change the text and button text
+    // to the opposite value
+    naughtyButton.addEventListener('click', () => {
+        if (dog.isGoodDog) {
+            dog.isGoodDog = false
+        } else {
+            dog.isGoodDog = true
+        }
+        // Render the card to update the innterText
+        render()
+    })
+
+    naughtyTextContainer.appendChild(naughtyText)
+    naughtyTextContainer.appendChild(naughtyButton)
+    return naughtyTextContainer
 }
 
-document.addEventListener('DOMContentLoaded', () => {
+function render() {
+    const card = document.querySelector('.main__dog-section')
+
+    // Clear out the HTML of the main section
+    card.innerHTML = ''
+
+    // If the + button is selected show the form
+    if (state.selectedDogID === 0) {
+        createForm(card)
+        return
+    }
+
+    // Match the selected ID (button) with the corresponding element in the array
+    const selectedDog = state.dogs.find((dog) => dog.id == state.selectedDogID)
+
+    // Create the elements needed
+    const dogName = document.createElement('h2')
+    dogName.innerText = selectedDog.name
+
+    const dogImage = document.createElement('img')
+    dogImage.src = selectedDog.image
+
+    // Append the elements to the card
+    card.appendChild(dogName)
+    card.appendChild(dogImage)
+    card.appendChild(dogBio(selectedDog))
+    card.appendChild(naughtyText(selectedDog))
+}
+
+function loadEntirePage() {
+    // Reset the list with buttons to the default state
+    const navButtonList = document.querySelector('.dogs-list')
+    navButtonList.innerHTML = `
+        <li class="dogs-list__button dogs-list__button--add">+</li>
+    `
+
+    // Loop through all the entries and display the buttons
     for (i = 0; i < state.dogs.length; i++) {
         const headerUL = document.querySelector('ul')
         headerUL.appendChild(createNavButton(state.dogs[i]))
     }
+
+    // Add logic to + button
     createAddButton()
+    // Load the cards
     render()
+}
+
+// Load all the content on page load
+document.addEventListener('DOMContentLoaded', () => {
+    loadEntirePage()
 })
