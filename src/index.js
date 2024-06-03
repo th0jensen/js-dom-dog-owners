@@ -22,7 +22,7 @@ function createNavButton(dogs) {
 
 function createNaughtyButton(dog) {
     const naughtyButton = document.createElement('button')
-    naughtyButton.innerText = 'Good dog!'
+    naughtyButton.innerText = `${dog.isGoodDog ? 'Bad dog!' : 'Good dog!'}`
 
     naughtyButton.addEventListener('click', () => {
         if (dog.isGoodDog) {
