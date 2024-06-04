@@ -49,7 +49,20 @@ function createForm(card) {
     nameInput.setAttribute('type', 'text')
     nameInput.setAttribute('id', 'name')
     nameInput.setAttribute('name', 'name')
+    nameInput.required = true
     form.appendChild(nameInput)
+
+    const breedLabel = document.createElement('label')
+    breedLabel.setAttribute('for', 'breed')
+    breedLabel.innerText = "Dog's breed"
+    form.appendChild(breedLabel)
+
+    const breedInput = document.createElement('input')
+    breedInput.setAttribute('type', 'text')
+    breedInput.setAttribute('id', 'breed')
+    breedInput.setAttribute('name', 'breed')
+    breedInput.required = true
+    form.appendChild(breedInput)
 
     const imageLabel = document.createElement('label')
     imageLabel.setAttribute('for', 'image')
@@ -60,7 +73,20 @@ function createForm(card) {
     imageInput.setAttribute('type', 'url')
     imageInput.setAttribute('id', 'image')
     imageInput.setAttribute('name', 'image')
+    imageInput.required = true
     form.appendChild(imageInput)
+
+    const ageLabel = document.createElement('label')
+    ageLabel.setAttribute('for', 'age')
+    ageLabel.innerText = "Dog's age"
+    form.appendChild(ageLabel)
+
+    const ageInput = document.createElement('input')
+    ageInput.setAttribute('type', 'number')
+    ageInput.setAttribute('id', 'age')
+    ageInput.setAttribute('name', 'age')
+    ageInput.required = true
+    form.appendChild(ageInput)
 
     const bioLabel = document.createElement('label')
     bioLabel.setAttribute('for', 'bio')
@@ -91,11 +117,14 @@ function createForm(card) {
         const newDog = {
             id: state.dogs.length + 1,
             name: newDogData.get('name'),
+            breed: newDogData.get('breed'),
             image: newDogData.get('image'),
+            age: newDogData.get('age'),
             bio: newDogData.get('bio'),
         }
         // Add the new dog as the first element in the dogs array
         state.dogs.unshift(newDog)
+        console.log(state.dogs)
         // Show the user the dog that was just created
         state.selectedDogID = newDog.id
         // Render both the buttons and the displayed card
@@ -172,9 +201,15 @@ function render() {
     const dogImage = document.createElement('img')
     dogImage.src = selectedDog.image
 
+    const dogInfo = document.createElement('p')
+    dogInfo.innerHTML = `
+        ${selectedDog.breed} | Age: ${selectedDog.age}
+    `
+
     // Append the elements to the card
     card.appendChild(dogName)
     card.appendChild(dogImage)
+    card.appendChild(dogInfo)
     card.appendChild(dogBio(selectedDog))
     card.appendChild(naughtyText(selectedDog))
 }
