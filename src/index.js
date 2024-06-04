@@ -5,6 +5,7 @@ console.log(data)
 const state = {
     dogs: data,
     selectedDogID: 1,
+    isEditing: false,
 }
 
 // Create the buttons on the top of the page
@@ -64,18 +65,6 @@ function createForm(card) {
     breedInput.required = true
     form.appendChild(breedInput)
 
-    const imageLabel = document.createElement('label')
-    imageLabel.setAttribute('for', 'image')
-    imageLabel.innerText = "Dog's picture"
-    form.appendChild(imageLabel)
-
-    const imageInput = document.createElement('input')
-    imageInput.setAttribute('type', 'url')
-    imageInput.setAttribute('id', 'image')
-    imageInput.setAttribute('name', 'image')
-    imageInput.required = true
-    form.appendChild(imageInput)
-
     const ageLabel = document.createElement('label')
     ageLabel.setAttribute('for', 'age')
     ageLabel.innerText = "Dog's age"
@@ -88,6 +77,18 @@ function createForm(card) {
     ageInput.required = true
     form.appendChild(ageInput)
 
+    const imageLabel = document.createElement('label')
+    imageLabel.setAttribute('for', 'image')
+    imageLabel.innerText = "Dog's picture"
+    form.appendChild(imageLabel)
+
+    const imageInput = document.createElement('input')
+    imageInput.setAttribute('type', 'url')
+    imageInput.setAttribute('id', 'image')
+    imageInput.setAttribute('name', 'image')
+    imageInput.required = true
+    form.appendChild(imageInput)
+
     const bioLabel = document.createElement('label')
     bioLabel.setAttribute('for', 'bio')
     bioLabel.innerText = "Dog's bio"
@@ -98,6 +99,18 @@ function createForm(card) {
     bioInput.setAttribute('id', 'bio')
     bioInput.setAttribute('name', 'bio')
     form.appendChild(bioInput)
+
+    const goodDogLabel = document.createElement('label')
+    goodDogLabel.setAttribute('for', 'goodDog')
+    goodDogLabel.innerText = 'Is s/he a good dog?'
+    form.appendChild(goodDogLabel)
+
+    const goodDogInput = document.createElement('input')
+    goodDogInput.setAttribute('type', 'checkbox')
+    goodDogInput.setAttribute('checked', 'checked')
+    goodDogInput.setAttribute('id', 'goodDog')
+    goodDogInput.setAttribute('name', 'goodDog')
+    form.appendChild(goodDogInput)
 
     const submitButton = document.createElement('input')
     submitButton.setAttribute('type', 'submit')
@@ -118,9 +131,10 @@ function createForm(card) {
             id: state.dogs.length + 1,
             name: newDogData.get('name'),
             breed: newDogData.get('breed'),
-            image: newDogData.get('image'),
             age: newDogData.get('age'),
+            image: newDogData.get('image'),
             bio: newDogData.get('bio'),
+            isGoodDog: newDogData.get('goodDog'),
         }
         // Add the new dog as the first element in the dogs array
         state.dogs.unshift(newDog)
@@ -128,6 +142,114 @@ function createForm(card) {
         // Show the user the dog that was just created
         state.selectedDogID = newDog.id
         // Render both the buttons and the displayed card
+        loadEntirePage()
+    })
+}
+
+function editForm(card, dog) {
+    // Create the elements
+    const header = document.createElement('h2')
+    header.innerText = `Edit ${dog.name}`
+    card.appendChild(header)
+
+    const form = document.createElement('form')
+    form.classList.add('form')
+
+    const nameLabel = document.createElement('label')
+    nameLabel.setAttribute('for', 'name')
+    nameLabel.innerText = "Dog's name"
+    form.appendChild(nameLabel)
+
+    const nameInput = document.createElement('input')
+    nameInput.setAttribute('type', 'text')
+    nameInput.setAttribute('id', 'name')
+    nameInput.setAttribute('name', 'name')
+    nameInput.value = dog.name
+    form.appendChild(nameInput)
+
+    const breedLabel = document.createElement('label')
+    breedLabel.setAttribute('for', 'breed')
+    breedLabel.innerText = "Dog's breed"
+    form.appendChild(breedLabel)
+
+    const breedInput = document.createElement('input')
+    breedInput.setAttribute('type', 'text')
+    breedInput.setAttribute('id', 'breed')
+    breedInput.setAttribute('name', 'breed')
+    breedInput.value = dog.breed
+    form.appendChild(breedInput)
+
+    const ageLabel = document.createElement('label')
+    ageLabel.setAttribute('for', 'age')
+    ageLabel.innerText = "Dog's age"
+    form.appendChild(ageLabel)
+
+    const ageInput = document.createElement('input')
+    ageInput.setAttribute('type', 'number')
+    ageInput.setAttribute('id', 'age')
+    ageInput.setAttribute('name', 'age')
+    ageInput.value = dog.age
+    form.appendChild(ageInput)
+
+    const imageLabel = document.createElement('label')
+    imageLabel.setAttribute('for', 'image')
+    imageLabel.innerText = "Dog's picture"
+    form.appendChild(imageLabel)
+
+    const imageInput = document.createElement('input')
+    imageInput.setAttribute('type', 'url')
+    imageInput.setAttribute('id', 'image')
+    imageInput.setAttribute('name', 'image')
+    imageInput.value = dog.image
+    form.appendChild(imageInput)
+
+    const bioLabel = document.createElement('label')
+    bioLabel.setAttribute('for', 'bio')
+    bioLabel.innerText = "Dog's bio"
+    form.appendChild(bioLabel)
+
+    const bioInput = document.createElement('textarea')
+    bioInput.setAttribute('rows', '5')
+    bioInput.setAttribute('id', 'bio')
+    bioInput.setAttribute('name', 'bio')
+    bioInput.value = dog.bio
+    form.appendChild(bioInput)
+
+    const goodDogLabel = document.createElement('label')
+    goodDogLabel.setAttribute('for', 'goodDog')
+    goodDogLabel.innerText = 'Is s/he a good dog?'
+    form.appendChild(goodDogLabel)
+
+    const goodDogInput = document.createElement('input')
+    goodDogInput.setAttribute('type', 'checkbox')
+    goodDogInput.setAttribute('checked', 'checked')
+    goodDogInput.setAttribute('id', 'goodDog')
+    goodDogInput.setAttribute('name', 'goodDog')
+    form.appendChild(goodDogInput)
+
+    const submitButton = document.createElement('input')
+    submitButton.setAttribute('type', 'submit')
+    submitButton.setAttribute('id', 'submit')
+    submitButton.setAttribute('name', 'submit')
+    submitButton.setAttribute('value', 'Save changes')
+    submitButton.classList.add('form__button')
+    form.appendChild(submitButton)
+
+    card.appendChild(form)
+
+    // Add submit action
+    form.addEventListener('submit', (event) => {
+        event.preventDefault()
+        const newDogData = new FormData(form)
+        // Fetch the data from the form and create a new object
+        dog.name = newDogData.get('name')
+        dog.breed = newDogData.get('breed')
+        dog.age = newDogData.get('age')
+        dog.image = newDogData.get('image')
+        dog.bio = newDogData.get('bio')
+        dog.isGoodDog = newDogData.get('goodDog')
+        console.log(newDogData.get('goodDog'))
+        state.isEditing = false
         loadEntirePage()
     })
 }
@@ -194,6 +316,11 @@ function render() {
     // Match the selected ID (button) with the corresponding element in the array
     const selectedDog = state.dogs.find((dog) => dog.id == state.selectedDogID)
 
+    if (state.isEditing) {
+        editForm(card, selectedDog)
+        return
+    }
+
     // Create the elements needed
     const dogName = document.createElement('h2')
     dogName.innerText = selectedDog.name
@@ -206,12 +333,21 @@ function render() {
         ${selectedDog.breed} | Age: ${selectedDog.age}
     `
 
+    const editButton = document.createElement('button')
+    editButton.innerText = 'Edit'
+    editButton.classList.add('edit--button')
+    editButton.addEventListener('click', () => {
+        state.isEditing = true
+        render()
+    })
+
     // Append the elements to the card
     card.appendChild(dogName)
     card.appendChild(dogImage)
     card.appendChild(dogInfo)
     card.appendChild(dogBio(selectedDog))
     card.appendChild(naughtyText(selectedDog))
+    card.appendChild(editButton)
 }
 
 function loadEntirePage() {
