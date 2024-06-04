@@ -192,7 +192,6 @@ textarea {
 }
 
 .edit--button {
-    position: relative;
-    top: -740px;
-    right: -400px;
+    margin-top: 15px;
+    width: 100%;
 }
